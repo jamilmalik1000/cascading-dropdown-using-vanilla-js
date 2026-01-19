@@ -1,62 +1,63 @@
-let countryInfo = {
+const countryInfo = {
   Pakistan: {
-    Punjab: { Lahore: [], Faisalabad: [], Multan: [], Rawalpindi: [], Gujranwala: [] },
-    Sindh: { Karachi: [], Hyderabad: [], Sukkur: [], Larkana: [] },
-    KKP: { Peshawar: [], Mardan: [], Swat: [], Abbottabad: [] },
-    Balochistan: { Quetta: [], Khuzdar: [], Turbat: [], Gwadar: [] },
-    Gilgit_Baltistan: { Gilgit: [], Skardu: [], Hunza: [], Nagar: [] },
-    Azad_Kashmir: { Muzaffarabad: [], Mirpur: [], Rawalakot: [] }
+    Punjab: ["Lahore", "Faisalabad", "Multan", "Rawalpindi", "Gujranwala"],
+    Sindh: ["Karachi", "Hyderabad", "Sukkur", "Larkana"],
+    KPK: ["Peshawar", "Mardan", "Swat", "Abbottabad"],
+    Balochistan: ["Quetta", "Khuzdar", "Turbat", "Gwadar"],
+    Gilgit_Baltistan: ["Gilgit", "Skardu", "Hunza", "Nagar"],
+    Azad_Kashmir: ["Muzaffarabad", "Mirpur", "Rawalakot"]
   },
   India: {
-    Maharashtra: { Mumbai: [], Pune: [], Nagpur: [] },
-    Delhi: { New_Delhi: [], Delhi: [] },
-    Tamil_Nadu: { Chennai: [], Coimbatore: [] }
+    Maharashtra: ["Mumbai", "Pune", "Nagpur"],
+    Delhi: ["New Delhi", "Delhi"],
+    Tamil_Nadu: ["Chennai", "Coimbatore"]
   },
   Afghanistan: {
-    Kabul: { Kabul_City: [], Paghman: [] },
-    Kandahar: { Kandahar_City: [], Dand: [] },
-    Herat: { Herat_City: [], Injil: [] }  
+    Kabul: ["Kabul City", "Paghman"],
+    Kandahar: ["Kandahar City", "Dand"],
+    Herat: ["Herat City", "Injil"]
   }
 };
+function resetSelect(select, placeholder) {
+  select.innerHTML = `<option value="">${placeholder}</option>`;
+}
 
-window.onload = function() {
-  const countrySelect = document.getElementById('country');
-  const provinceSelect = document.getElementById('Province');
-  const citySelect = document.getElementById('city');
+function populateSelect(select, items) {
+  items.forEach(item => {
+    select.add(new Option(item, item));
+  });
+}
+document.addEventListener("DOMContentLoaded", () => {
+  const countrySelect = document.getElementById("country");
+  const provinceSelect = document.getElementById("Province");
+  const citySelect = document.getElementById("city");
 
+  resetSelect(countrySelect, "Select Country");
+  resetSelect(provinceSelect, "Select Province");
+  resetSelect(citySelect, "Select City");
 
-  for (const country in countryInfo) {
-    countrySelect.options[countrySelect.options.length] = new Option(country, country);
-  }
+  populateSelect(countrySelect, Object.keys(countryInfo));
 
+  countrySelect.addEventListener("change", () => {
+    resetSelect(provinceSelect, "Select Province");
+    resetSelect(citySelect, "Select City");
 
+    if (!countrySelect.value) return;
 
-  
+    populateSelect(
+      provinceSelect,
+      Object.keys(countryInfo[countrySelect.value])
+    );
+  });
 
-  countrySelect.onchange = function() {
- 
-    provinceSelect.length = 1; 
-    citySelect.length = 1; 
+  provinceSelect.addEventListener("change", () => {
+    resetSelect(citySelect, "Select City");
 
-    if (this.value !== "") {
-      const provinces = countryInfo[this.value];
-      for (const province in provinces) {
-        provinceSelect.options[provinceSelect.options.length] = new Option(province, province);
-      }
-    }
-  };
+    if (!provinceSelect.value) return;
 
-
-  provinceSelect.onchange = function() {
-
-    citySelect.length = 1; 
-
-    if (this.value !== "") {
-      const selectedCountry = countrySelect.value;
-      const cities = countryInfo[selectedCountry][this.value];
-      for (const city in cities) {
-        citySelect.options[citySelect.options.length] = new Option(city, city);
-      }
-    }
-  };
-};
+    populateSelect(
+      citySelect,
+      countryInfo[countrySelect.value][provinceSelect.value]
+    );
+  });
+});
